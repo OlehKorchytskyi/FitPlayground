@@ -4,7 +4,11 @@ Clone this repository recursively to get a playground and also [Fit package](htt
 
 
 ```
-git clone --recursive https://github.com/OlehKorchytskyi/FitPlayground
+git clone https://github.com/OlehKorchytskyi/FitPlayground
+
+cd FitPlayground
+
+git clone https://github.com/OlehKorchytskyi/Fit
 ```
 
 After cloning the repository, open **Fit.xcworkspace** in Xcode.
