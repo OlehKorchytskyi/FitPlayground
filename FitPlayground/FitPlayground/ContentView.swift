@@ -9,15 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-//        PlaygroundView {
-//            ForEach(0..<50) { i in
-//                Text("\(i)")
-//                    .padding(10)
-//                    .background(.gray)
-//            }
-//        }
-//        .padding()
-        ConveyorBeltExample()
+        PlaygroundPreview()
     }
 }
 

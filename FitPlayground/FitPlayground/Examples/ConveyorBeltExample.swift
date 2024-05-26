@@ -68,6 +68,6 @@ struct ConveyorBeltExample: View {
     }
 }
 
-#Preview {
+#Preview("Conveyor Belt") {
     ConveyorBeltExample()
 }

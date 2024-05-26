@@ -49,13 +49,30 @@ struct PlaygroundView<Content: View>: View {
         }
     }
     
+    private var alignmentIndicator: some View {
+        Rectangle()
+            .frame(width: 8, height: 8)
+    }
+    
     var body: some View {
         GeometryReader { geometry in
-            GeometryReader { _ in
+            List {
+
+                Text("First line in the list")
                 Fit(lineStyle: lineStyle, itemAlignment: itemAlignment, itemSpacing: itemSpacingRule) {
                     content()
                 }
                 .border(showBorder ? Color.gray : .clear)
+                
+                Text("Test line list")
+                
+                HStack(alignment: itemAlignment) {
+                    ForEach(0..<3) {
+                        Text("Text \($0)")
+                    }
+                }
+                
+                Text("Test line list")
             }
             .padding()
             .frame(maxWidth: geometry.size.width - 300)
@@ -206,28 +223,57 @@ extension VerticalAlignment: Hashable, Identifiable {
 }
 
 
-
-
-
-
 #Preview(traits: .fixedLayout(width: 800, height: 600)) {
-    PlaygroundView {
-        Group {
-            
-            Image(systemName: "swift")
-                .imageScale(.large)
-            
-            Text("Swift")
-            Text("SwiftUI")
-            Text("Swift\nConcurrency")
-                .fit(lineBreak: .after)
-            
-            ForEach(1..<51) { number in
-                Text(number, format: .number.precision(.integerLength(2)))
-                    .monospaced()
+    PlaygroundPreview()
+}
+
+struct PlaygroundPreview: View {
+    
+    var body: some View {
+        PlaygroundView {
+            Group {
+                
+                Image(systemName: "swift")
+                    .imageScale(.large)
+                
+                Text("Swift")
+                Text("SwiftUI")
+                Text("Swift\nConcurrency")
+                    .fit(lineBreak: .after)
+                
+                ForEach(1..<21) { number in
+                    
+                    let view =
+                    Text(number, format: .number.precision(.integerLength(2)))
+                        .monospaced()
+                        .border(Color.yellow)
+                    
+                    if number == 5 {
+                        view
+                            .alignmentGuide(VerticalAlignment.center) { dimension in
+                                dimension[VerticalAlignment.center] - 20
+                            }
+                    } else {
+                        view
+                    }
+                    
+                }
+                
+                Fit {
+                    Text("Test")
+                    Text("Test")
+                    Fit {
+                        Text("Test")
+                        Text("Test")
+                        Text("Test")
+                    }
+                }
+                
             }
+            .padding(6)
+            .background(.black, in: .rect(cornerRadius: 4))
         }
-        .padding(6)
-        .background(.black, in: .rect(cornerRadius: 4))
+        .preferredColorScheme(.dark)
+
     }
 }
