@@ -1,6 +1,6 @@
 # Installation
 
-Clone this repository recursively to get a playground and also [Fit package](https://github.com/OlehKorchytskyi/Fit).
+Clone this repository and [Fit package](https://github.com/OlehKorchytskyi/Fit).
 
 
 ```
