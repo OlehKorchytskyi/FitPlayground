@@ -31,6 +31,7 @@ struct TagListExample: View {
     
     var body: some View {
         VStack(alignment: .leading) {
+            Fit(lineSpacing: 20, itemSpacing: 10) {  }
             Fit(lineSpacing: 12, itemAlignment: .firstTextBaseline) {
                 
                 Text("Tags:")

@@ -16,21 +16,32 @@ struct PlaygroundView<Content: View>: View {
     @State private var showBorder = true
     
     @State private var linesAlignment: LineAlignment = .leading
-    @State private var itemAlignment: VerticalAlignment = .center
+    @State private var itemAlignment: VerticalAlignment = .top
     
-    @State private var useViewSpacing = true
-    @State private var minimumSpacing: CGFloat = 0
+    @State private var useViewLineSpacing = true
+    @State private var lineSpacing: CGFloat = 0
+    
+    @State private var useViewSpacing = false
+    @State private var minimumSpacing: CGFloat = 8
     
     @State private var reverse = false
     @State private var reverseEvenLinesOnly = false
     @State private var stretch = false
     @State private var stretchThreshold: Double = 0
     
+    private var lineSpacingRule: LineSpacing {
+        if useViewLineSpacing {
+            .viewSpacing(minimum: lineSpacing)
+        } else {
+            .fixed(lineSpacing)
+        }
+    }
+    
     private var itemSpacingRule: ItemSpacing {
         if useViewSpacing {
-            ItemSpacing.viewSpacing(minimum: minimumSpacing)
+            .viewSpacing(minimum: minimumSpacing)
         } else {
-            ItemSpacing.fixed(minimumSpacing)
+            .fixed(minimumSpacing)
         }
     }
     
@@ -59,20 +70,61 @@ struct PlaygroundView<Content: View>: View {
             List {
 
                 Text("First line in the list")
-                Fit(lineStyle: lineStyle, itemAlignment: itemAlignment, itemSpacing: itemSpacingRule) {
+                
+                Fit(
+                    lineStyle: lineStyle,
+                    lineSpacing: lineSpacingRule,
+                    itemAlignment: itemAlignment,
+                    itemSpacing: itemSpacingRule
+                ) {
                     content()
                 }
                 .border(showBorder ? Color.gray : .clear)
                 
                 Text("Test line list")
                 
-                HStack(alignment: itemAlignment) {
-                    ForEach(0..<3) {
-                        Text("Text \($0)")
-                    }
+                let verticalGuide = VerticalAlignment.bottom
+                HStack(alignment: verticalGuide) {
+                    Text("HStack")
+                        .alignmentGuide(verticalGuide) { d in
+                            d[verticalGuide] + 10
+                        }
+                    Text("Testing")
+                        .alignmentGuide(verticalGuide) { d in
+                            d[verticalGuide] + 10
+                        }
+                    Text("Alignment")
+                        .alignmentGuide(verticalGuide) { d in
+                            d[verticalGuide] + 10
+                        }
+                    Text("Guid")
+                        .alignmentGuide(verticalGuide) { d in
+                            d[verticalGuide] + 10
+                        }
+                }
+                .border(Color.black)
+                
+                Fit {
+                    Text("One item test")
+                }
+                .border(Color.black)
+                
+                HStack {
+                    Text("Zero items test:")
+                    Fit {}.border(Color.black)
                 }
                 
-                Text("Test line list")
+                Fit {
+                    let rectangle = Rectangle()
+                        .foregroundStyle(.red)
+                        .frame(width: 100, height: 30)
+                    rectangle
+                        .fit(lineBreak: .after)
+                    Text("Text")
+                    rectangle
+                        .fit(lineBreak: .before)
+                }
+                .border(Color.black)
             }
             .padding()
             .frame(maxWidth: geometry.size.width - 300)
@@ -86,14 +138,15 @@ struct PlaygroundView<Content: View>: View {
     }
     
     
-    @ViewBuilder
     private var configurator: some View {
         List {
             previewOptions
             
             alignmentSelection
             
-            spacingSelection
+            lineSpacingSelection
+            
+            itemSpacingSelection
             
             directionSelection
         }
@@ -101,14 +154,12 @@ struct PlaygroundView<Content: View>: View {
         .scrollContentBackground(.hidden)
     }
     
-    @ViewBuilder
     private var previewOptions: some View {
         Section("Preview") {
             Toggle("Show border", isOn: $showBorder)
         }
     }
     
-    @ViewBuilder
     private var alignmentSelection: some View {
         Section("Alignment") {
             VStack {
@@ -138,9 +189,25 @@ struct PlaygroundView<Content: View>: View {
         .pickerStyle(.menu)
     }
     
-    @ViewBuilder
-    private var spacingSelection: some View {
-        Section("Item spacing") {
+
+    private var lineSpacingSelection: some View {
+        Section("LINE spacing") {
+            Toggle("Use view spacing", isOn: $useViewLineSpacing.animation(.easeInOut))
+            HStack {
+
+                Slider(value: $lineSpacing.animation(.easeInOut), in: -8...16, step: 1) {
+                        Text("Minimum")
+                }
+                
+                Text("\(lineSpacing, format: .number.precision(.integerLength(2)))")
+                    .monospaced()
+            }
+        }
+    }
+    
+
+    private var itemSpacingSelection: some View {
+        Section("ITEM spacing") {
             Toggle("Use view spacing", isOn: $useViewSpacing.animation(.easeInOut))
             HStack {
 
@@ -160,7 +227,7 @@ struct PlaygroundView<Content: View>: View {
         }
     }
     
-    @ViewBuilder
+
     private var directionSelection: some View {
         Section("Line direction") {
             HStack {
@@ -232,48 +299,56 @@ struct PlaygroundPreview: View {
     var body: some View {
         PlaygroundView {
             Group {
-                
                 Image(systemName: "swift")
                     .imageScale(.large)
                 
                 Text("Swift")
                 Text("SwiftUI")
+                    .fit(lineBreak: .after)
                 Text("Swift\nConcurrency")
                     .fit(lineBreak: .after)
                 
-                ForEach(1..<21) { number in
+                Group {
+                    let guid = VerticalAlignment.top
+                    Text("AA")
+                        .alignmentGuide(guid) { $0[guid] + 8 }
+
+                    Text("BB")
+                        .alignmentGuide(guid) { $0[guid] - 8 }
                     
-                    let view =
+                    Text("CC")
+                    
+                    Text("DD")
+                        .alignmentGuide(guid) { $0[guid] - 16 }
+                        .fit(lineBreak: .after)
+                }
+                .overlay(alignment: .top) { VStack { Divider() } }
+                
+                Text("Numbers:")
+                    .fit(lineBreak: .after)
+                
+                ForEach(1..<21) { number in
                     Text(number, format: .number.precision(.integerLength(2)))
                         .monospaced()
-                        .border(Color.yellow)
-                    
-                    if number == 5 {
-                        view
-                            .alignmentGuide(VerticalAlignment.center) { dimension in
-                                dimension[VerticalAlignment.center] - 20
-                            }
-                    } else {
-                        view
-                    }
-                    
                 }
+                
+                Rectangle()
+                    .frame(width: 15, height: 15)
                 
                 Fit {
-                    Text("Test")
-                    Text("Test")
+                    Text("Testing")
+                    Text("Embedded")
+                    
                     Fit {
-                        Text("Test")
-                        Text("Test")
-                        Text("Test")
+                        Text("Fit")
+                        Text("Container")
                     }
                 }
-                
             }
-            .padding(6)
-            .background(.black, in: .rect(cornerRadius: 4))
+            .border(Color.black)
+//            .background(.black.opacity(0.3),
+//                        in: .rect(cornerRadius: 4))
         }
         .preferredColorScheme(.dark)
-
     }
 }

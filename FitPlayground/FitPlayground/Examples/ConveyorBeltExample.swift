@@ -44,10 +44,11 @@ struct ConveyorBeltExample: View {
                         .geometryGroup()
                 }
             }
+
             .font(.system(size: 27))
-            .padding()
             .animation(.bouncy(duration: 0.3), value: packages.count)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
         }
         .frame(maxWidth: 420, maxHeight: 180, alignment: .leading)
         .task {
@@ -62,7 +63,7 @@ struct ConveyorBeltExample: View {
         Task { @MainActor in
             for i in 1..<30 where Task.isCancelled == false {
                 packages.append(Package(id: i))
-                try? await Task.sleep(nanoseconds: 100_000_000)
+                try? await Task.sleep(nanoseconds: 450_000_000)
             }
         }
     }
